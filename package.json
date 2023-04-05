@@ -1,0 +1,23 @@
+{
+  "name": "jaysassistant",
+  "version": "1.0.0",
+  "description": "A private bot for JayCord",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JayCordDev/Assistant.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JayCordDev/Assistant/issues"
+  },
+  "homepage": "https://github.com/JayCordDev/Assistant#readme",
+  "dependencies": {
+    "discord.js": "^14.8.0",
+    "dotenv": "^16.0.3",
+    "mongoose": "^7.0.3",
+    "ms": "^2.1.3",
+    "randomstring": "^1.2.3"
+  }
+}
