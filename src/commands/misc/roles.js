@@ -20,9 +20,9 @@ module.exports = {
                     .setRequired(true)    
             )
             .addRoleOption(option => option
-                .setName('role')
-                .setDescription('Role to give.')
-                .setRequired(true)  
+                    .setName('role')
+                    .setDescription('Role to give.')
+                    .setRequired(true)  
             )
     )
     .addSubcommand(subcmd => subcmd
@@ -34,9 +34,9 @@ module.exports = {
                     .setRequired(true)    
             )
             .addRoleOption(option => option
-                .setName('role')
-                .setDescription('Role to remove.')
-                .setRequired(true)  
+                    .setName('role')
+                    .setDescription('Role to remove.')
+                    .setRequired(true)  
             )
     ),
     /**
