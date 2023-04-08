@@ -1,10 +1,11 @@
-const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { Emojis, Colours } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
     .setName('roles')
     .setDescription('List all server roles.')
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
     .setDMPermission(false)
     .addSubcommand(subcmd => subcmd
             .setName('list')
