@@ -19,10 +19,6 @@ module.exports = {
             .setDescription('The ban reason.')
             .setMaxLength(1000)
             .setMinLength(1)
-    )
-    .addStringOption(option => option
-            .setName('duration')
-            .setDescription('The ban duration.')
     ),
     /**
      * @param {ChatInputCommandInteraction} interaction
@@ -33,8 +29,7 @@ module.exports = {
         const TargetUser = options.getUser('target');
         const TargetMember = await guild.members.fetch(TargetUser.id);
         const BanReason = options.getString('reason') || 'No reason provided.';
-        const BanDuration = options.getString('duration') || '365d';
-
+        
         const BanDate = new Date(createdTimestamp).toDateString();
         const LogChannel = guild.channels.cache.get(IDs.ModerationLogs);
         const CaseId = createCaseId();
@@ -77,22 +72,12 @@ module.exports = {
              });
 
              ban.save();
-
-             if (BanDuration) {
-                setTimeout(async () => {
-                    await guild.bans.fetch().then(ban => {
-                        if (ban.find(user => user.user.id === TargetUser.id)) {
-                            guild.bans.remove(TargetUser.id, 'Duration expired.');
-                        };
-                    });
-                 }, BanDuration);
-             };
         });
 
         const LogEmbed = new EmbedBuilder()
         .setColor('Red')
         .setAuthor({ name: `${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
-        .setDescription(`**Member**: <@${TargetUser.id}> | \`${TargetUser.id}\`\n**Type**: Ban\n**Duration**: ${BanDuration}\n**Reason**: ${BanReason}`)
+        .setDescription(`**Member**: <@${TargetUser.id}> | \`${TargetUser.id}\`\n**Type**: Ban\n**Reason**: ${BanReason}`)
         .setFooter({ text: `Punishment ID: ${CaseId}` })
         .setTimestamp()
 
