@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, inlineCode } = require('discord.js');
 const { Emojis, Links, PunishmentTypes, IDs } = require('../../config.json');
 const { createCaseId } = require('../../util/generateCaseId');
 const database = require('../../database/schemas/PunishmentSchema.js');
@@ -20,9 +20,9 @@ module.exports = {
             .setMaxLength(1000)
             .setMinLength(1)
     )
-    .addBooleanOption(option => option
-            .setName('appeal')
-            .setDescription('Whether or not they can appeal.')
+    .addStringOption(option => option
+            .setName('duration')
+            .setDescription('The ban duration.')
     ),
     /**
      * @param {ChatInputCommandInteraction} interaction
@@ -33,7 +33,7 @@ module.exports = {
         const TargetUser = options.getUser('target');
         const TargetMember = await guild.members.fetch(TargetUser.id);
         const BanReason = options.getString('reason') || 'No reason provided.';
-        const CanAppeal = options.getBoolean('appeal');
+        const BanDuration = options.getString('duration') || '365d';
 
         const BanDate = new Date(createdTimestamp).toDateString();
         const LogChannel = guild.channels.cache.get(IDs.ModerationLogs);
@@ -43,15 +43,17 @@ module.exports = {
             content: `${Emojis.Error_Emoji} Unable to perform action.`
         });
 
-        if (CanAppeal) {
-            await TargetUser.send({
-                content: `You have been banned from **${guild.name}** for the reason: **${BanReason}**\n\nIf you wish to appeal follow this link: ${Links.Appeal_Link}`
-            }).catch(console.error);
-        } else {
-            await TargetUser.send({ 
-                content: `You have been banned from **${guild.name}** for the reason: **${BanReason}**\n\nYou cannot appeal this ban.`
-            }).catch(console.error);
-        };
+        const DirectMessageEmbed = new EmbedBuilder()
+        .setColor('Grey')
+        .setDescription(`You have received a ban in **${guild.name}**`)
+        .setFields(
+            { name: 'Reason', value: `${inlineCode(BanReason)}` },
+            { name: 'Appeal', value: `${Links.Appeal_Link}` }
+        )
+
+        await TargetUser.send({
+            embeds: [DirectMessageEmbed]
+        }).catch(console.error);
         
         await TargetMember.ban({ deleteMessageSeconds: 86400, reason: BanReason }).then(async () => {
             interaction.reply({ 
@@ -69,18 +71,28 @@ module.exports = {
                         Moderator: user.tag,
                         PunishmentDate: BanDate,
                         Reason: BanReason,
-                        Appeal: CanAppeal
+                        Duration: BanDuration
                     }
                 ],
              });
 
              ban.save();
+
+             if (BanDuration) {
+                setTimeout(async () => {
+                    await guild.bans.fetch().then(ban => {
+                        if (ban.find(user => user.user.id === TargetUser.id)) {
+                            guild.bans.remove(TargetUser.id, 'Duration expired.');
+                        };
+                    });
+                 }, BanDuration);
+             };
         });
 
         const LogEmbed = new EmbedBuilder()
         .setColor('Red')
         .setAuthor({ name: `${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
-        .setDescription(`**Member**: <@${TargetUser.id}> | \`${TargetUser.id}\`\n**Type**: Ban\n**Reason**: ${BanReason}`)
+        .setDescription(`**Member**: <@${TargetUser.id}> | \`${TargetUser.id}\`\n**Type**: Ban\n**Duration**: ${BanDuration}\n**Reason**: ${BanReason}`)
         .setFooter({ text: `Punishment ID: ${CaseId}` })
         .setTimestamp()
 
