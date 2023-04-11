@@ -37,8 +37,15 @@ module.exports = {
             content: `${Error_Emoji} Unable to perform action.`
         });
         
-        await TargetUser.send({ 
-            content: `You have been warned in **${guild.name}** for the reason: ${WarnReason}`
+        const DirectMessageEmbed = new EmbedBuilder()
+        .setColor('Grey')
+        .setDescription(`You have received a warning in **${guild.name}**`)
+        .setFields(
+            { name: 'Reason', value: `${inlineCode(WarnReason)}` },
+        )
+
+        await TargetUser.send({
+            embeds: [DirectMessageEmbed]
         }).catch(console.error);
         
         const warn = await database.create({
