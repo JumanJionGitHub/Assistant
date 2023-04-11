@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, inlineCode } = require('discord.js');
 const { Emojis, PunishmentTypes, IDs } = require('../../config.json');
 const { createCaseId } = require('../../util/generateCaseId');
 const database = require('../../database/schemas/PunishmentSchema.js');
@@ -38,8 +38,15 @@ module.exports = {
             content: `${Emojis.Error_Emoji} Unable to kick this user.`
         });
         
-       	await TargetUser.send({ 
-            content: `You have been kicked from **${guild.name}** for the reason: **${KickReason}**`
+        const DirectMessageEmbed = new EmbedBuilder()
+        .setColor('Grey')
+        .setDescription(`You have received a kick in **${guild.name}**`)
+        .setFields(
+            { name: 'Reason', value: `${inlineCode(KickReason)}` },
+        )
+
+        await TargetUser.send({
+            embeds: [DirectMessageEmbed]
         }).catch(console.error);
 
         await TargetMember.kick(KickReason).then(async () => {
