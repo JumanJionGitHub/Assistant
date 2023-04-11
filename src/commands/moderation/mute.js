@@ -61,7 +61,7 @@ module.exports = {
             embeds: [DirectMessageEmbed]
         }).catch(console.error);
 
-        await TargetMember.timeout(ms(MuteDuration)).then(async () => {
+        await TargetMember.timeout(ms(MuteDuration), MuteReason).then(async () => {
             interaction.reply({ 
                 content: `${Emojis.Success_Emoji} Muted **${TargetUser.tag}** for **${MuteExpiry}** (Case #${CaseId})`
              });
