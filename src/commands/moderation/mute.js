@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, inlineCode } = require('discord.js');
 const { Emojis, Links, PunishmentTypes, IDs } = require('../../config.json');
 const { createCaseId } = require('../../util/generateCaseId');
 const database = require('../../database/schemas/PunishmentSchema.js');
@@ -48,8 +48,17 @@ module.exports = {
             });
         };
         
-        await TargetUser.send({ 
-            content: `You have been muted in **${guild.name}** for the reason: ${MuteReason}\nExpiry: **${MuteExpiry}**\nIf you wish to appeal follow this link: ${Links.Appeal_Link}`
+        const DirectMessageEmbed = new EmbedBuilder()
+        .setColor('Grey')
+        .setDescription(`You have received a mute in **${guild.name}**`)
+        .setFields(
+            { name: 'Reason', value: `${inlineCode(MuteReason)}` },
+            { name: 'Expiry', value: `${MuteExpiry}` },
+            { name: 'Appeal', value: `${Links.Appeal_Link}` }
+        )
+
+        await TargetUser.send({
+            embeds: [DirectMessageEmbed]
         }).catch(console.error);
 
         await TargetMember.timeout(ms(MuteDuration)).then(async () => {
