@@ -1,3 +1,4 @@
+
 console.clear();
 
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
@@ -17,7 +18,7 @@ const client = new Client({
 client.commands = new Collection();
 
 const handlerFiles = readdirSync('./src/handlers/').filter(file => file.endsWith('.js'));
-for (const file of handlerFiles) require(`./handlers/${file}`)(client);
+for (const file of handlerFiles) require(`./src/handlers/${file}`)(client);
 
 const systemFolders = readdirSync('./src/systems/');
 for (const folder of systemFolders) {
